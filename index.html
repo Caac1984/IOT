@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Lâmpadas e Monitoramento</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f286acd, #2575fc);
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .status div {
+            flex: 1 1 30%;
+            max-width: 200px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .status div:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .lampada {
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .lampada.on {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .lampada.off {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .sensor {
+            font-size: 1.5em;
+            color: #fff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        footer a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Status do Sistema</h1>
+        <div class="status">
+            <div>
+                <h2>Lâmpada 1</h2>
+                <p id="lampada-1" class="lampada off">Desligada</p>
+            </div>
+            <div>
+                <h2>Lâmpada 2</h2>
+                <p id="lampada-2" class="lampada off">Desligada</p>
+            </div>
+            <div>
+                <h2>Lâmpada 3</h2>
+                <p id="lampada-3" class="lampada off">Desligada</p>
+            </div>
+            <div>
+                <h2>Lâmpada 4</h2>
+                <p id="lampada-4" class="lampada off">Desligada</p>
+            </div>
+        </div>
+        <div class="status">
+            <div>
+                <h2>Temperatura</h2>
+                <p id="temperatura" class="sensor">-- °C</p>
+            </div>
+            <div>
+                <h2>Umidade</h2>
+                <p id="umidade" class="sensor">-- %</p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        Desenvolvido com ❤️ pelo Grupo de Alunos.
+    </footer>
+
+    <script>
+        // Token gerado no Blynk
+        const BLYNK_AUTH_TOKEN = "SEU_TOKEN_AQUI";            //  <---------   Auterar o TOKEN AQUI  <-----------
+        const API_URL = `https://blynk.cloud/external/api`;
+
+        // Função para buscar dados do Blynk
+        async function fetchData() {
+            try {
+                // Pinos das lâmpadas
+                const lampadas = [
+                    { id: "lampada-1", pin: "V1" },  //  <---------   Auterar o pino AQUI  <-----------
+                    { id: "lampada-2", pin: "V2" },  //  <---------   Auterar o pino AQUI  <-----------
+                    { id: "lampada-3", pin: "V3" },  //  <---------   Auterar o pino AQUI  <-----------
+                    { id: "lampada-4", pin: "V4" },  //  <---------   Auterar o pino AQUI  <-----------
+                ];
+
+                // Ler dados das lâmpadas
+                for (const lampada of lampadas) {
+                    const response = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=${lampada.pin}`);
+                    const status = await response.text();
+                    const element = document.getElementById(lampada.id);
+
+                    element.textContent = status === "1" ? "Ligada" : "Desligada";
+                    element.className = status === "1" ? "lampada on" : "lampada off";
+                }
+
+                // Ler dados dos sensores
+                const temperaturaResponse = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=V5`);
+                const umidadeResponse = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=V6`);
+
+                const temperatura = await temperaturaResponse.text();
+                const umidade = await umidadeResponse.text();
+
+                document.getElementById("temperatura").textContent = `${temperatura} °C`;
+                document.getElementById("umidade").textContent = `${umidade} %`;
+            } catch (error) {
+                console.error("Erro ao buscar os dados do Blynk:", error);
+            }
+        }
+
+        // Atualizar dados a cada 5 segundos
+        setInterval(fetchData, 5000);
+        fetchData(); // Carregar os dados imediatamente ao abrir a página
+    </script>
+</body>
+</html>
