@@ -4,3 +4,6 @@
 
 ## Recursos Requeridos
     Uma conta no Blynk e o hardware configurado (como ESP8266 ou ESP32) para enviar os dados de temperatura, umidade e estado das lâmpadas.
+
+
+   

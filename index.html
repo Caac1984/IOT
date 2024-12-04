@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon/iot.png">
     <title>Controle de Lâmpadas e Monitoramento</title>
     <style>
         body {
@@ -140,23 +141,23 @@
 
     <script>
         // Token gerado no Blynk
-        const BLYNK_AUTH_TOKEN = "SEU_TOKEN_AQUI";            //  <---------   Auterar o TOKEN AQUI  <-----------
-        const API_URL = `https://blynk.cloud/external/api`;
+        const BLYNK_AUTH_TOKEN = "IKEeiBpMx1BJQPu8n-RFGsnx-4jIraUW";  // Substitua pelo seu token real
+        const API_URL = "https://blynk.cloud/external/api/get";  // URL correta para a API
 
         // Função para buscar dados do Blynk
         async function fetchData() {
             try {
                 // Pinos das lâmpadas
                 const lampadas = [
-                    { id: "lampada-1", pin: "V1" },  //  <---------   Auterar o pino AQUI  <-----------
-                    { id: "lampada-2", pin: "V2" },  //  <---------   Auterar o pino AQUI  <-----------
-                    { id: "lampada-3", pin: "V3" },  //  <---------   Auterar o pino AQUI  <-----------
-                    { id: "lampada-4", pin: "V4" },  //  <---------   Auterar o pino AQUI  <-----------
+                    { id: "lampada-1", pin: "V0" },
+                    { id: "lampada-2", pin: "V1" },
+                    { id: "lampada-3", pin: "V2" },
+                    { id: "lampada-4", pin: "V3" }
                 ];
 
                 // Ler dados das lâmpadas
                 for (const lampada of lampadas) {
-                    const response = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=${lampada.pin}`);
+                    const response = await fetch(`${API_URL}?token=${BLYNK_AUTH_TOKEN}&pin=${lampada.pin}`);
                     const status = await response.text();
                     const element = document.getElementById(lampada.id);
 
@@ -164,9 +165,9 @@
                     element.className = status === "1" ? "lampada on" : "lampada off";
                 }
 
-                // Ler dados dos sensores
-                const temperaturaResponse = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=V5`);
-                const umidadeResponse = await fetch(`${API_URL}/get?token=${BLYNK_AUTH_TOKEN}&pin=V6`);
+                // Ler dados dos sensores (Temperatura e Umidade)
+                const temperaturaResponse = await fetch(`${API_URL}?token=${BLYNK_AUTH_TOKEN}&pin=V5`);
+                const umidadeResponse = await fetch(`${API_URL}?token=${BLYNK_AUTH_TOKEN}&pin=V6`);
 
                 const temperatura = await temperaturaResponse.text();
                 const umidade = await umidadeResponse.text();
